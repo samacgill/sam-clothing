@@ -1,3 +1,5 @@
+//no lonoger needed as in firestore
+
 const SHOP_DATA = {
   hats: {
     id: 1,

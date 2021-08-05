@@ -12,6 +12,7 @@ const config = {
   appId: "1:876316879215:web:42082ee97c2a1889d3e09a",
   measurementId: "G-BPV82LR26Y",
 };
+firebase.initializeApp(config);
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
@@ -49,7 +50,39 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   return userRef;
 };
 
-firebase.initializeApp(config);
+//temporary utility function to populate firestore
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+  //firebase can only make one call at a time so need to batch documents
+  const batch = firestore.batch();
+  objectsToAdd.forEach((obj) => {
+    //gives new empty document with random id
+    const newDocRef = collectionRef.doc();
+    //fill with object
+    batch.set(newDocRef, obj);
+  });
+  return await batch.commit();
+};
+//converting to an object rather than the array that comes back from Firestore
+export const ConvertCollectionsSnapshotToMap = (collections) => {
+  const transoformedCcollection = collections.docs.map((doc) => {
+    const { title, items } = doc.data();
+    return {
+      routeName: encodeURI(title.toLowerCase()),
+      id: doc.id,
+      title,
+      items,
+    };
+  });
+  //transoforming from array into object with collection title as key
+  return transoformedCcollection.reduce((acc, collection) => {
+    acc[collection.title.toLowerCase()] = collection;
+    return acc;
+  }, {});
+};
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
