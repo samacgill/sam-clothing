@@ -16,12 +16,7 @@ firebase.initializeApp(config);
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
-  // let userRef = firestore.collection("users").doc("DmergPQKGGKj7Wo88cxc");
-  // const userRef = firestore.doc("users/DmergPQKGGKj7Wo88cxc");
   const userRef = firestore.doc(`users/${userAuth.uid}`);
-
-  // const collRef = firestore.collection("users");
-  // console.log(collRef);
 
   // the documentRef methods are .set(), .get(), .update() and .delete()
   // can also add to collection using collectionRef object and .add() method
@@ -46,7 +41,6 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
       console.log("error creating user", error.message);
     }
   }
-  // function returns userRef, which we can use to set state
   return userRef;
 };
 
@@ -84,11 +78,23 @@ export const ConvertCollectionsSnapshotToMap = (collections) => {
   }, {});
 };
 
+//NB we're just mimicking another backend. Firebase makes this easier
+//getting unsibscibe from auth then immediately unsubscribing
+//if there is a userAuth object it will resolve with it; if there isn't it'll return null
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged((userAuth) => {
+      unsubscribe();
+      resolve(userAuth);
+    }, reject);
+  });
+};
+
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
 export default firebase;
