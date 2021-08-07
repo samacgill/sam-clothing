@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
-import memoize from "lodash.memoize";
-import ShopActionTypes from "./shop.types";
+// import memoize from "lodash.memoize";
+// import ShopActionTypes from "./shop.types";
 //????memoize to do Lecture 149 didn't make sense
 
 const selectShop = (state) => state.shop;
